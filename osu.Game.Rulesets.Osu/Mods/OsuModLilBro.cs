@@ -9,10 +9,14 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.UI;
 using osu.Game.Configuration;
 using osu.Framework.Bindables;
+using System;
+using osu.Game.Beatmaps;
+using osu.Game.Utils;
+using System.Linq;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModLilBro : Mod, IUpdatableByPlayfield, IApplicableToDrawableRuleset<OsuHitObject>
+    public class OsuModLilBro : Mod, IUpdatableByPlayfield, IApplicableToDrawableRuleset<OsuHitObject>, IApplicableToBeatmap
     {
         public override string Name => "Lil Bro";
         public override string Acronym => "LB";
@@ -21,33 +25,56 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override ModType Type => ModType.Fun;
 
         private static readonly Vector2 playfield_center = OsuPlayfield.BASE_SIZE / 2;
-        private static readonly float offset_factor_y = OsuPlayfield.BASE_SIZE.X / OsuPlayfield.BASE_SIZE.Y;
+
+        // make playfield a little smaller so that you can reach the top and bottom edges at high scale
+        private static readonly float base_scale = 0.9f;
+
+        private static readonly float transition_duration = 100;
 
         [SettingSource("Scale")]
         public Bindable<float> PlayfieldScale { get; } = new BindableFloat(1.5f)
         {
-            MinValue = 1.1f,
-            MaxValue = 2f,
+            MinValue = 1.25f,
+            MaxValue = 1.75f,
             Precision = 0.01f
         };
 
+        private float offsetFactorY;
+
+        private PeriodTracker spinnerPeriods = null!;
+
         private PlayfieldAdjustmentContainer playfieldAdjustmentContainer = null!;
 
-        // TODO: как-то сделать так, чтобы при большом увеличении до краев игрового поля можно было достать (пересмотреть логику офсетов и тд)
         public void Update(Playfield playfield)
         {
-            var offset = playfield.Cursor.ActiveCursor.Position - playfield_center;
-            offset.Y *= offset_factor_y;
-            playfieldAdjustmentContainer.Position = -(offset * PlayfieldScale.Value - offset);
+            if (!spinnerPeriods.IsInAny(playfield.Clock.CurrentTime))
+            {
+                var offset = (playfield.Cursor.ActiveCursor.Position - playfield_center) * base_scale;
+                offset.Y *= offsetFactorY;
+                playfieldAdjustmentContainer.Position = -(offset * PlayfieldScale.Value - offset);
+            }
+            else
+            {
+                playfieldAdjustmentContainer.Position = new Vector2(0, 0);
+            }
 
-            playfield.Cursor.ActiveCursor.Scale = new Vector2(1 / PlayfieldScale.Value);
+
+            playfield.Cursor.ActiveCursor.Scale = new Vector2(1 / PlayfieldScale.Value) * base_scale;
         }
 
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
             playfieldAdjustmentContainer = drawableRuleset.PlayfieldAdjustmentContainer;
 
-            playfieldAdjustmentContainer.Scale = new Vector2(PlayfieldScale.Value);
+            var playfieldSize = drawableRuleset.Playfield.DrawSize;
+            offsetFactorY = MathF.Max(playfieldSize.X, playfieldSize.Y) / MathF.Min(playfieldSize.X, playfieldSize.Y);
+
+            playfieldAdjustmentContainer.Scale = new Vector2(PlayfieldScale.Value) * base_scale;
+        }
+
+        public void ApplyToBeatmap(IBeatmap beatmap)
+        {
+            spinnerPeriods = new PeriodTracker(beatmap.HitObjects.OfType<Spinner>().Select(b => new Period(b.StartTime - transition_duration, b.EndTime)));
         }
     }
 }
