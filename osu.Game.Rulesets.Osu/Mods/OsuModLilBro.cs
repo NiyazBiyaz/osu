@@ -27,8 +27,6 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private static readonly Vector2 base_offset = new Vector2(0, -13);
 
-        private static readonly float offset_factor_y = OsuPlayfield.BASE_SIZE.X / OsuPlayfield.BASE_SIZE.Y;
-
         // make playfield a little smaller so that you can reach the top and bottom edges at high scale
         private static readonly float base_scale = 0.9f;
 
@@ -51,7 +49,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             if (!spinnerPeriods.IsInAny(playfield.Clock.CurrentTime))
             {
                 var offset = (playfield.Cursor.ActiveCursor.Position - playfield_center) * base_scale;
-                offset.Y *= offset_factor_y;
+                offset.Y *= playfield.DrawSize.X / playfield.DrawSize.Y;
                 playfieldAdjustmentContainer.Position = -(offset * PlayfieldScale.Value - offset) + base_offset;
             }
             else
