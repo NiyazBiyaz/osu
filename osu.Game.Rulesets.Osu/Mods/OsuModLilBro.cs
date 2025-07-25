@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Localisation;
@@ -22,6 +23,12 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override LocalisableString Description => "Why is everything so.. large?!";
         public override double ScoreMultiplier => 1;
         public override ModType Type => ModType.Fun;
+        public override Type[] IncompatibleMods => new[]
+        {
+            typeof(OsuModBarrelRoll),
+            typeof(OsuModBloom),
+            typeof(OsuModBubbles)
+        };
 
         private static readonly Vector2 playfield_center = OsuPlayfield.BASE_SIZE / 2;
 
