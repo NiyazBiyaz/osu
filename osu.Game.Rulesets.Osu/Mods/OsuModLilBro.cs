@@ -19,13 +19,13 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override string Name => "Lil Bro";
         public override string Acronym => "LB";
-        public override LocalisableString Description => "Why i'm so small?!";
+        public override LocalisableString Description => "Why is everything so.. large?!";
         public override double ScoreMultiplier => 1;
         public override ModType Type => ModType.Fun;
 
         private static readonly Vector2 playfield_center = OsuPlayfield.BASE_SIZE / 2;
 
-        private static readonly Vector2 base_offset = new Vector2(0, -13);
+        private static readonly Vector2 base_offset = new Vector2(0, -12.8f);
 
         // make playfield a little smaller so that you can reach the top and bottom edges at high scale
         private static readonly float base_scale = 0.9f;
