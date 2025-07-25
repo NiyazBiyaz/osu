@@ -1,18 +1,18 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Game.Rulesets.Mods;
-using osu.Framework.Localisation;
-using osu.Game.Rulesets.Osu.UI;
-using osuTK;
-using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.UI;
-using osu.Game.Configuration;
-using osu.Framework.Bindables;
 using System;
-using osu.Game.Beatmaps;
-using osu.Game.Utils;
 using System.Linq;
+using osu.Framework.Bindables;
+using osu.Framework.Localisation;
+using osu.Game.Beatmaps;
+using osu.Game.Configuration;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.UI;
+using osu.Game.Rulesets.UI;
+using osu.Game.Utils;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
