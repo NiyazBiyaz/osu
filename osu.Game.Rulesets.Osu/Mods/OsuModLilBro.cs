@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
 using osu.Framework.Bindables;
 using osu.Framework.Localisation;
@@ -26,6 +25,10 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         private static readonly Vector2 playfield_center = OsuPlayfield.BASE_SIZE / 2;
 
+        private static readonly Vector2 base_offset = new Vector2(0, -13);
+
+        private static readonly float offset_factor_y = OsuPlayfield.BASE_SIZE.X / OsuPlayfield.BASE_SIZE.Y;
+
         // make playfield a little smaller so that you can reach the top and bottom edges at high scale
         private static readonly float base_scale = 0.9f;
 
@@ -39,8 +42,6 @@ namespace osu.Game.Rulesets.Osu.Mods
             Precision = 0.01f
         };
 
-        private float offsetFactorY;
-
         private PeriodTracker spinnerPeriods = null!;
 
         private PlayfieldAdjustmentContainer playfieldAdjustmentContainer = null!;
@@ -50,8 +51,8 @@ namespace osu.Game.Rulesets.Osu.Mods
             if (!spinnerPeriods.IsInAny(playfield.Clock.CurrentTime))
             {
                 var offset = (playfield.Cursor.ActiveCursor.Position - playfield_center) * base_scale;
-                offset.Y *= offsetFactorY;
-                playfieldAdjustmentContainer.Position = -(offset * PlayfieldScale.Value - offset);
+                offset.Y *= offset_factor_y;
+                playfieldAdjustmentContainer.Position = -(offset * PlayfieldScale.Value - offset) + base_offset;
             }
             else
             {
@@ -65,9 +66,6 @@ namespace osu.Game.Rulesets.Osu.Mods
         public void ApplyToDrawableRuleset(DrawableRuleset<OsuHitObject> drawableRuleset)
         {
             playfieldAdjustmentContainer = drawableRuleset.PlayfieldAdjustmentContainer;
-
-            var playfieldSize = drawableRuleset.Playfield.DrawSize;
-            offsetFactorY = MathF.Max(playfieldSize.X, playfieldSize.Y) / MathF.Min(playfieldSize.X, playfieldSize.Y);
 
             playfieldAdjustmentContainer.Scale = new Vector2(PlayfieldScale.Value) * base_scale;
         }
